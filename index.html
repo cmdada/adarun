@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adarun</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #282c34;
+            color: #abb2bf;
+            margin: 0;
+            padding: 20px;
+        }
+        #dashboard {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #app-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .app-item {
+            background-color: #3e4451;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-item:hover {
+            background-color: #4b5263;
+        }
+        .app-name {
+            cursor: pointer;
+        }
+        .app-actions button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            background-color: #5c6370;
+            border: none;
+            color: #abb2bf;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .app-actions button:hover {
+            background-color: #6c7380;
+        }
+        #add-app {
+            margin-top: 20px;
+        }
+        input, button {
+            background-color: #3e4451;
+            border: none;
+            color: #abb2bf;
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        button {
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4b5263;
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard">
+        <h1>adarun</h1>
+        <ul id="app-list"></ul>
+
+        <div id="add-app">
+            <input type="text" id="app-name" placeholder="App Name">
+            <input type="text" id="app-url" placeholder="App URL">
+            <button onclick="addApp()">add app</button>
+        </div>
+    </div>
+    <script>
+        let apps = JSON.parse(localStorage.getItem('apps')) || [];
+        function renderApps() {
+            const appList = document.getElementById('app-list');
+            appList.innerHTML = '';
+            apps.forEach((app, index) => {
+                const li = document.createElement('li');
+                li.className = 'app-item';
+                li.innerHTML = `
+                    <span class="app-name" onclick="openApp('${app.url}')">${app.name}</span>
+                    <div class="app-actions">
+                        <button onclick="editApp(${index})">Edit</button>
+                        <button onclick="deleteApp(${index})">Delete</button>
+                    </div>
+                `;
+                appList.appendChild(li);
+            });
+        }
+        function addApp() {
+            const name = document.getElementById('app-name').value;
+            const url = document.getElementById('app-url').value;
+            if (name && url) {
+                apps.push({ name, url });
+                saveApps();
+                renderApps();
+                document.getElementById('app-name').value = '';
+                document.getElementById('app-url').value = '';
+            }
+        }
+        function openApp(url) {
+            window.open(url, '_blank');
+        }
+        function editApp(index) {
+            const newName = prompt("Enter new name:", apps[index].name);
+            const newUrl = prompt("Enter new URL:", apps[index].url);
+            if (newName && newUrl) {
+                apps[index] = { name: newName, url: newUrl };
+                saveApps();
+                renderApps();
+            }
+        }
+        function deleteApp(index) {
+            if (confirm("Are you sure you want to delete this app?")) {
+                apps.splice(index, 1);
+                saveApps();
+                renderApps();
+            }
+        }
+        function saveApps() {
+            localStorage.setItem('apps', JSON.stringify(apps));
+        }
+        renderApps();
+    </script>
+</body>
+</html>
